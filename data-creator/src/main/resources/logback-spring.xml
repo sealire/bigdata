@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="SYS_LOG_DIR" value="log/dataio"/>
-    <property name="LOG_FILE" value="dataio_log"/>
+    <property name="SYS_LOG_DIR" value="log/datacreator"/>
+    <property name="LOG_FILE" value="datacreator_log"/>
     <property name="consoleLayoutPattern"
               value="%-20(%d{yyyyMMdd_HH:mm:ss.SSS} [%logger][%thread] [%-4relative]) [%X{hostName} %X{requestId} %X{processId} %X{service.timing} ][%level] %msg%n"/>
     <property name="fileLayoutPattern"
@@ -14,7 +14,7 @@
         </encoder>
     </appender>
 
-    <appender name="dataio_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="datacreator_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${SYS_LOG_DIR}/${LOG_FILE}.txt</File>
         <append>true</append>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -36,7 +36,7 @@
         <appender-ref ref="STDOUT"/>
     </root>
 
-    <logger name="org.leesia.dataio" level="DEBUG">
-        <appender-ref ref="dataio_log"/>
+    <logger name="org.leesia.datacreator" level="DEBUG">
+        <appender-ref ref="datacreator_log"/>
     </logger>
 </configuration>

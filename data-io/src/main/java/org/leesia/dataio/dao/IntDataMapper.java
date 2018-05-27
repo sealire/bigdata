@@ -3,8 +3,8 @@ package org.leesia.dataio.dao;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
-import org.leesia.dataio.domain.IntData;
-import org.leesia.dataio.domain.IntDataCriteria;
+import org.leesia.entity.IntData;
+import org.leesia.entity.IntDataCriteria;
 
 public interface IntDataMapper {
     long countByExample(IntDataCriteria example);
@@ -28,6 +28,4 @@ public interface IntDataMapper {
     int updateByPrimaryKeySelective(IntData record);
 
     int updateByPrimaryKey(IntData record);
-
-    int bacthInsert(List<IntData> datas);
 }

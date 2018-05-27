@@ -31,7 +31,7 @@
         </jdbcConnection>
 
         <!-- 生成实体类 -->
-        <javaModelGenerator targetPackage="org.leesia.dataio.domain"
+        <javaModelGenerator targetPackage="org.leesia.entity"
                             targetProject="src/main/java">
             <property name="enableSubPackages" value="true"/>
         </javaModelGenerator>

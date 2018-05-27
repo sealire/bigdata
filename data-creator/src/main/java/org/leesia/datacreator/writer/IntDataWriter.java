@@ -1,7 +1,8 @@
-package org.leesia.dataio.business.writer;
+package org.leesia.datacreator.writer;
 
-import org.leesia.dataio.domain.IntData;
+import org.leesia.datacreator.util.SpringUtil;
 import org.leesia.dataio.service.IntDataService;
+import org.leesia.entity.IntData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,28 +18,20 @@ import java.util.concurrent.Executors;
  * @Date: 2018/5/22 08:57
  * @Description: 整数写入
  */
-@Component
 public class IntDataWriter extends DataWriter {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(IntDataWriter.class);
 
-    //要生成的整数个数
-    private static final int COUNT = 100_000_000;
-
-    //批量生成的整数个数
-    private static final int BATCH_COUNT = 10_000;
-
-    //存储线程睡眠时间
-    private static final long SLEEP = 30;
-
-    @Autowired
     private IntDataService dataService;
 
     private int threadSize = 1;
 
     private ExecutorService executor;
 
-    public IntDataWriter() {
+    public IntDataWriter(int total, int batchCount) {
+        dataService = (IntDataService) SpringUtil.getBean("intDataService");
+        this.total = total;
+        this.batchCount = batchCount;
         threadSize = Runtime.getRuntime().availableProcessors();
         executor = Executors.newFixedThreadPool(threadSize);
     }
@@ -46,13 +39,12 @@ public class IntDataWriter extends DataWriter {
     @Override
     public void createAndWrite() {
         List<Integer> sizes = allocateTask();
-        long sleep = SLEEP / threadSize;
         for (Integer size : sizes) {
             executor.execute(createTask(size));
             try {
                 Thread.sleep(sleep);
             } catch (InterruptedException e) {
-                logger.warn("InterruptedException异常：" + e);
+                logger.warn("InterruptedException异常：{}", e);
             }
         }
         executor.shutdown();
@@ -61,13 +53,12 @@ public class IntDataWriter extends DataWriter {
     @Override
     public void batchCreateAndWrite() {
         List<Integer> sizes = allocateTask();
-        long sleep = SLEEP / threadSize;
         for (Integer size : sizes) {
             executor.execute(createBatchTask(size));
             try {
                 Thread.sleep(sleep);
             } catch (InterruptedException e) {
-                logger.warn("InterruptedException异常：" + e);
+                logger.warn("InterruptedException异常：{}", e);
             }
         }
         executor.shutdown();
@@ -75,18 +66,19 @@ public class IntDataWriter extends DataWriter {
 
     private IntData createData() {
         IntData data = new IntData();
-        data.setNumber((int) (Math.random() * Integer.MAX_VALUE));
+        int sign = Math.random() > 0.5 ? 1 : -1;
+        data.setNumber(sign * (int) (Math.random() * Integer.MAX_VALUE));
         return data;
     }
 
     public List<Integer> allocateTask() {
         List<Integer> tasks = new ArrayList<>();
-        int size = COUNT / threadSize;
+        int size = total / threadSize;
         for (int i = 0; i < threadSize; i++) {
             tasks.add(size);
         }
-        if (COUNT % threadSize != 0) {
-            int remain = COUNT % threadSize;
+        if (total % threadSize != 0) {
+            int remain = total % threadSize;
             for (int i = 0; i < remain; i++) {
                 Integer count = tasks.get(i);
                 count++;
@@ -98,7 +90,6 @@ public class IntDataWriter extends DataWriter {
 
     private Runnable createTask(int size) {
         return () -> {
-            long sleep = SLEEP;
             long start = 0;
             long end = 0;
             boolean exception = false;
@@ -114,7 +105,7 @@ public class IntDataWriter extends DataWriter {
                     end = System.currentTimeMillis();
                     i--;
                     sleep += ((long) (sleep * 0.1));
-                    logger.warn("整数入库异常：",  e);
+                    logger.warn("整数入库异常：{}",  e);
                 }
                 try {
                     if (exception) {
@@ -122,7 +113,7 @@ public class IntDataWriter extends DataWriter {
                     } else {
                         sleep = (threadSize - 1) * (end - start);
                     }
-                    logger.info("sleep：" + sleep + "ms");
+                    logger.info("sleep：{}ms" + sleep);
                     Thread.sleep(sleep);
                 } catch (InterruptedException e) {
                     logger.warn("InterruptedException异常：{}", e);
@@ -134,13 +125,13 @@ public class IntDataWriter extends DataWriter {
     private Runnable createBatchTask(final int size) {
         return () -> {
             int total = size;
-            while (total > BATCH_COUNT) {
+            while (total > batchCount) {
                 List<IntData> datas = new ArrayList<>();
-                for (int i = 0; i < BATCH_COUNT; i++) {
+                for (int i = 0; i < batchCount; i++) {
                     datas.add(createData());
                 }
                 batchInsert(datas);
-                total -= BATCH_COUNT;
+                total -= batchCount;
             }
             if (total > 0) {
                 List<IntData> datas = new ArrayList<>();
@@ -153,7 +144,7 @@ public class IntDataWriter extends DataWriter {
     }
 
     private synchronized void batchInsert(List<IntData> datas) {
-        logger.warn("整数批量入库：",  datas.size());
+        logger.info("整数批量入库：{}",  datas.size());
         dataService.batchInsert(datas);
     }
 }

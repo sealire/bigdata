@@ -1,4 +1,4 @@
-package org.leesia.dataio.domain;
+package org.leesia.entity;
 
 import java.util.ArrayList;
 import java.util.List;

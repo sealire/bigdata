@@ -1,4 +1,4 @@
-package org.leesia.dataio.util;
+package org.leesia.median.util;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationContext;
  * @Date: 2018/5/16 21:23
  * @Description:
  */
-public class SpringUtil{
+public class SpringUtil {
 
     private static ApplicationContext applicationContext;
 

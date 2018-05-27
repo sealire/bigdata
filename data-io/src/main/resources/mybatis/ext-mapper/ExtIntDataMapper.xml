@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.leesia.dataio.dao.ExtIntDataMapper">
+  <resultMap id="BaseResultMap" type="org.leesia.entity.IntData">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="number" jdbcType="INTEGER" property="number" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, number
+  </sql>
+
+  <insert id="bacthInsert">
+    insert into int_data
+    (number)
+    values
+    <foreach collection ="list" item="data" separator =",">
+      (#{data.number,jdbcType=INTEGER})
+    </foreach >
+  </insert>
+  <select id="bacthRead" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from int_data
+    where
+      id between #{from,jdbcType=INTEGER} and #{to,jdbcType=INTEGER}
+      <choose>
+        <when test="min != null and max != null">
+          and number between #{min, jdbcType=INTEGER} and #{max, jdbcType=INTEGER}
+        </when>
+        <when test="min != null">
+          and number &gt;= #{min, jdbcType=INTEGER}
+        </when>
+        <when test="max != null">
+          and number &lt;= #{max, jdbcType=INTEGER}
+        </when>
+      </choose>
+  </select>
+</mapper>
