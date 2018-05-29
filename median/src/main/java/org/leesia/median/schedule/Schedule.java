@@ -68,7 +68,7 @@ public class Schedule {
             add(Integer.MIN_VALUE);//下边界
             add(Integer.MAX_VALUE);//上边界
         }};
-        List<Integer> locations = computeLocation(from, to);//中位数位置，可能有两个
+        List<Integer> locations = computeLocation(from - 1, to - 1);//中位数位置，可能有两个
         if (count < singleBatchCount) {
             //可一次读进内存
             result = readAndSort(from, to, limits.get(0), limits.get(1), locations, count);
@@ -113,7 +113,8 @@ public class Schedule {
         List<Integer> locations = new ArrayList<>();
 
         long sum = 0;
-        sum += (from + to);
+        sum += from;
+        sum += to;
         locations.add((int) (sum / 2));
         if (sum % 2 == 1) {
             locations.add(locations.get(0) + 1);
@@ -192,31 +193,33 @@ public class Schedule {
     private List<Integer> computeIndex(List<Bucket> buckets, List<Integer> locations) {
         logger.info("计算中位数所在桶下标位置：locations：{}", locations);
         List<Integer> indexes = new ArrayList<>();
-        int index = locations.get(0);
+        int location = locations.get(0);
+        int flag_count = 0;
         int count = 0;
-        int sum = 0;
-        for (int i = 0, len = buckets.size(); i < len; i++) {
-            count += buckets.get(i).getSize();
-            if (count < index) {
-                sum += buckets.get(i).getSize();
-                continue;
-            }
-            indexes.add(i);
-            if (locations.size() == 2) {
-                index = locations.get(1);
-                while (i <len && count < index) {
-                    i++;
-                    index += buckets.get(i).getSize();
+        int index = 0;
+        while (count < location && index < buckets.size()) {
+            count += buckets.get(index).getSize();
+            index++;
+        }
+        if (index > 0) {
+            flag_count = count - buckets.get(index - 1).getSize();
+        }
+        indexes.add(index - 1);
+        if (locations.size() == 2) {
+            location = locations.get(1);
+            if (count < location && index < buckets.size()) {
+                while (count < location) {
+                    count += buckets.get(index).getSize();
+                    index++;
                 }
-                indexes.add(i);
+                indexes.add(index - 1);
             }
-            break;
         }
 
         //重新计算中位数下标位置
-        locations.set(0, locations.get(0) - sum);
+        locations.set(0, locations.get(0) - flag_count);
         if (locations.size() == 2) {
-            locations.set(1, locations.get(1) - sum);
+            locations.set(1, locations.get(1) - flag_count);
         }
         return indexes;
     }
