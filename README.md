@@ -9,6 +9,6 @@ entity                  数据类模型模块
 
 data-io                 数据IO模块
 
-data-creator            数据生成模块
+data-creator            数据生成，存储模块
 
-median                  中位数查找模块
+median                  亿级整数中查找中位数模块
