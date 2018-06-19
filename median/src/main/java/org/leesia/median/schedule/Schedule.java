@@ -69,7 +69,7 @@ public class Schedule {
             add(Integer.MAX_VALUE);//上边界
         }};
         List<Integer> locations = computeLocation(from - 1, to - 1);//中位数位置，可能有两个
-        if (count < singleBatchCount) {
+        if (count <= singleBatchCount) {
             //可一次读进内存
             result = readAndSort(from, to, limits.get(0), limits.get(1), locations, count);
             return result;
