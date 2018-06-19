@@ -75,11 +75,13 @@ public class Schedule {
             return result;
         }
 
+        int sort_mask = 0;
         int mask = 0b11111111_00000000_00000000_00000000;//排序掩码，从高8位开始桶排序
         List<Integer> paths = new ArrayList<>();//桶排序路径
         List<Bucket> buckets = new ArrayList<>();//桶
         List<Integer> indexes = new ArrayList<>();//中位数所在桶编号
         do {
+            sort_mask |= mask;
             logger.info("桶排序：total：{}，from：{}，to：{}，min：{}，max{}，locations：{}，mask：{}", count, from, to, limits.get(0), limits.get(1), locations, LeesiaUtil.toBinaryString(mask));
             //桶排序
             buckets = classify(from, to, limits.get(0), limits.get(1), mask);//分类
@@ -99,7 +101,7 @@ public class Schedule {
             result = readAndSort(from, to, limits.get(0), limits.get(1), locations, count);//内存排序
         }
 
-        logger.info("调度结束");
+        logger.info("调度结束，排序掩码路径：{}", LeesiaUtil.toBinaryString(sort_mask));
         return result;
     }
 
