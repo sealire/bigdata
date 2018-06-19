@@ -30,6 +30,7 @@
         <module>data-io</module>
         <module>median</module>
         <module>data-creator</module>
+        <module>most-value</module>
     </modules>
 
     <dependencies>
