@@ -12,3 +12,5 @@ data-io                 数据IO模块
 data-creator            数据生成，存储模块
 
 median                  亿级整数中查找中位数模块
+
+most-value              亿级整数中查找最大值或最小值
